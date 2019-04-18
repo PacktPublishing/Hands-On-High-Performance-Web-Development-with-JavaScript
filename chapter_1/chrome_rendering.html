@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin : 0;
+            padding : 0;
+        }
+        #paintingConstant {
+            width : 200px;
+            height : 100px;
+            background : red;
+            z-index : 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="paintingConstant"></div>
+    <div id="appendingElementsContainer"></div>
+    <canvas id="drawingContainer"></canvas>
+</body>
+<script type="text/javascript">
+    const paintingEl = document.getElementById('paintingConstant');
+    const appendEl = document.getElementById('appendingElementsContainer');
+    const canvasEl = document.getElementById('drawingContainer');
+    const colors = ['red', 'green', 'blue'];
+    //let count = 0;
+    // setInterval(() => {
+    //     paintingEl.style.background = colors[count % colors.length];
+    //     count += 1;
+    // }, 1000);
+
+    // let appendCount = 0;
+    // const append = function() {
+    //     if( appendCount >= 100 ) {
+    //         return clearInterval(append);
+    //     }
+    //     const temp = document.createElement('p');
+    //     temp.textContent = `We are element ${appendCount}`;
+    //     appendEl.appendChild(temp);
+    //     appendCount += 1;
+    // };
+    // setInterval(append, 1000);
+
+    // setTimeout(() => {
+    //     const prependElement = document.createElement('p');
+    //     prependElement.textContent = 'we are being prepended to the entire DOM';
+    //     prependElement.style.position = 'absolute';
+    //     prependElement.zIndex = "1";
+    //     prependElement.style.top = 0;
+    //     document.body.append(prependElement);
+    // }, 5000);
+    
+    // const context = canvasEl.getContext('2d');
+    // const fillStyles = ['green', 'red'];
+    // const numOfRunsX = 15;
+    // const numOfRunsY = 10;
+    // const totalRuns = numOfRunsX * numOfRunsY;
+    // let currX = 0;
+    // let currY = 0;
+    // let count = 0;
+    // const paint = function() {
+    //     context.fillStyle = fillStyles[count % 2];
+    //     context.fillRect(currX, currY, 10, 10);
+    //     count += 1;
+    //     currX = count * 10 % 150;
+    //     if( currX === 0 ) {
+    //         currY += 10;
+    //     }
+    //     if( count === totalRuns ) {
+    //         clearInterval(paint);
+    //     }
+    // }
+    // setInterval(paint, 1000);
+
+    // context.fillStyle = 'green';
+    // context.fillRect(10, 10, 10, 10);
+    // context.fillStyle = 'red';
+    // context.fillRect(20, 20, 10, 10);
+    // setTimeout(() => {
+    //     context.fillStyle = 'green';
+    //     context.fillRect(30, 30, 10, 10);
+    // }, 2000);
+
+    for(let i = 0; i < 1000000; i++) {
+        const temp = document.createElement('p');
+        temp.textContent = `We are element ${i}`;
+        appendEl.appendChild(temp);
+    }
+</script>
+</html>

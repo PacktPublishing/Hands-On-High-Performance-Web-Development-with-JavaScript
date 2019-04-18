@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+    <head>
+        <script type="text/javascript" src="./fake_library.js"></script>
+    </head>
+    <body>
+        <div id="container"></div>
+        <button id="add" onclick="addElement">Add</button>
+        <button id="remove" onclick="removeElement">Remove</button>
+        <button id="splice" onclick="spliceElement">Splice</button>
+        <input type="text" id="addElementText" />
+        <input type="number" id="spliceElementLocation" />
+        <script id="listElementTemplate" type="template">
+                <ul id="{{ id || __CREATE}}">
+                    <% for element in items %>
+                    <li id="{{ id || __CREATE }}">
+                        <span class="text">{{ text || __EMPTY }}</span>
+                        <button class="remove">Delete</button>
+                    </li>
+                    <% endfor %>
+                </ul>
+                </script>
+        
+        <script type="module">
+        // (function() {
+            const data = { id:"todoApp", items : [{
+                text : 'Write Anything'
+            }, {
+                text : 'Clean Dishes'
+            }, {
+                text : 'Get Sleep'
+            }, {
+                text : 'Do Nothing'
+            }, {
+                text : 'Get Groceries'
+            }, {
+                text : 'Write Some Code'
+            }, {
+                text : 'Do more work'
+            }]};
+
+            for(let i = 0; i < 10000; i++) {
+                data.items.push({ text: `Another item ${i}`});
+            }
+    
+    
+            const addElement = function() {
+    
+            };
+            const removeElement = function() {
+    
+            };
+            const spliceElement = function() {
+    
+            };
+            const runTemplate = function(template="", data) {
+                let idCount = 0;
+                let lvl = 0;
+                const DEFAULTS = {
+                    "__CREATE" : function() {
+                        return idCount += 1;
+                    },
+                    "__EMPTY" : function() {
+                        return "";
+                    }
+                }
+                let loopTemplate = [];
+                let inloop = false;
+                let loopIndex = 0;
+                let endLoopIndex = 0;
+                const splitTemplate = template.split(/\n|\r\n/g);
+                if(!splitTemplate.length) {
+                    return;
+                } 
+                for(let i = 0; i < splitTemplate.length; i++) {
+                    const match = /{{(.*?)}}/g;
+                    const loop = /<% for (.*) %>/g;
+                    const endloop = /<% endfor %>/g;
+                    let line = splitTemplate[i];
+                    let find = '';
+                    if( find = match.exec(line.trim()) ) {
+                        const item = find[1];
+                        let replace = '';
+                        if( inloop ) {
+                            loopTemplate.push(line);
+                        } else {
+                            // this is where we will fill in the template
+                            const keys = item.split(" ");
+                            keys.shift();
+                            keys.pop();
+                            // do we have it?
+                            if( Object.keys(data).includes(keys[0]) ) {
+                                replace += data[keys[0]];
+                                splitTemplate[i] = line.replace(find[0], replace);
+                            } else if( keys[1] === "||" && Object.keys(DEFAULTS).includes(keys[2]) ) { //default wanted
+                                replace += DEFAULTS[keys[2]]();
+                                splitTemplate[i] = line.replace(find[0], replace);
+                            } else {
+                                throw "No valid replacement value found!!!";
+                            }
+                        }
+                    } else if( find = loop.exec(line) ) {
+                        const item = find[1];
+                        const keys = item.split(" ");
+                        // keep count until endfor
+                        inloop = true;
+                        loopIndex = i;
+                    } else if( find = endloop.exec(line) ) {
+                        inloop = false;
+                        const loopTemp = loopTemplate.join('\n');
+                        let loopEls = [];
+                        const tempFun = runTemplate.bind(null, loopTemp);
+                        loopEls = data.items.map(tempFun);
+                        splitTemplate.splice(loopIndex, i - loopIndex + 1, ...loopEls);
+
+                    } else {
+                        if( inloop ) {
+                            loopTemplate.push(line);
+                        }
+                    }
+                    find = null;
+                    match.lastIndex = 0;
+                }
+                return splitTemplate.join('');
+            };
+    
+            const template = runTemplate(document.getElementById('listElementTemplate').text, data);
+            document.getElementById('container').innerHTML = template;
+
+            // for(let i = 0; i < 100000; i++) {
+            //     const j = Library.outerFun(true);
+            // }
+            // for(let i = 0; i < 100000; i++) {
+            //     const j = Library.outerFun(true);
+            // }
+            // for(let i = 0; i < 100000; i++) {
+            //     const j = Library.outerFun(true);
+            // }
+            // for(let i = 0; i < 100000; i++) {
+            //     const j = Library.outerFun(true);
+            // }
+            // for(let i = 0; i < 100000; i++) {
+            //     const j = Library.outerFun(true);
+            // }
+            // for(let i = 0; i < 100000; i++) {
+            //     const j = Library.outerFun(true);
+            // }
+        // })();
+        </script>
+    </body>
+    
+</html>

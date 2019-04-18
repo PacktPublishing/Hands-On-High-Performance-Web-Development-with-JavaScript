@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        * {
+            margin : 0;
+            padding : 0;
+        }
+        #outer {
+            height : 460px;
+            overflow-y : auto;
+        }
+        ul {
+            margin : 0;
+            padding : 0;
+        }
+        li {
+            padding : 5px;
+            font-size : 12px;
+            height : 12px;
+            border-bottom : 1px solid #ccc;
+            background : #333;
+        }
+        li:hover { 
+            border-bottom : 1px solid #eee;
+            background : #666;
+        }
+        #sideList {
+            position : absolute;
+            top: 0;
+            right : 50%;
+        }
+    </style>
+</head>
+<body>
+    <ul id="content"></ul>
+</body>
+<script type="text/javascript">
+    const list = document.getElementById('content');
+    const items = new Array(1000000);
+    const itemHeight = 23;
+    const containerHeight = 460;
+    const numItemsOnScreen = Math.floor(containerHeight / itemHeight);
+    const totalItemsAtOneTime = numItemsOnScreen * 2;
+
+    for(let i = 0; i < items.length; i++) {
+        items[i] = document.createElement('li');
+        items[i].textContent = `I am element ${i}`;
+    }
+    list.style.height = `${itemHeight * items.length}px`;
+    const checkForNewIndex = function(loc) {
+        let tIndex = Math.floor(Math.abs(loc) / ( itemHeight * numItemsOnScreen));
+        
+        if( tIndex !== currIndex ) {
+            currIndex = tIndex;
+            const fragment = document.createDocumentFragment();
+            fragment.append(...items.slice(currIndex * numItemsOnScreen, (currIndex + 2) * numItemsOnScreen));
+            list.style.paddingTop = `${currIndex * containerHeight}px`;
+            list.style.height = `${(itemHeight * items.length) - (currIndex * containerHeight)}px`;
+            list.innerHTML = '';
+            list.appendChild(fragment);
+        }
+    }
+
+    let currIndex = -1;
+    // setInterval(function() {
+    //     const y = list.getBoundingClientRect().y;
+    //     checkForNewIndex(y);
+    // }, 0);
+    list.onwheel = function(ev) {
+        const start = Date.now();
+        while(Date.now() < start + 1000) {; }
+        checkForNewIndex(list.getBoundingClientRect().y);
+    }
+</script>
+</html>

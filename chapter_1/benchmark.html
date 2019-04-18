@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+    <head>
+        <script type="text/javascript" src="./lodash.js"></script>
+        <script type="text/javascript" src="./benchmark.js"></script>
+    </head>
+    <body>
+        <h1>Benchmark Code</h1>
+        <ul id="results"></ul>
+        <script type="text/javascript">
+            const appendEl = document.getElementById('results');
+    
+            const startup = new Array(10000);
+            for(let i = 0; i < startup.length; i++) {
+                startup[i] =  i % 2 ? i : -i;
+            }
+    
+            const testBaseObj = {title : '', fun : function() {}};
+            Object.seal(testBaseObj);
+    
+            const forTest = Object.assign({}, testBaseObj);
+            forTest.title = 'for_loop';
+            forTest.fun = function() {
+                const arr = [];
+                for(let i = 0; i < startup.length; i++) {
+                    if(Math.abs(startup[i]) === startup[i]) {
+                        arr.push(startup[i]);
+                    }
+                }
+            }
+            const filterTest = Object.assign({}, testBaseObj);
+            filterTest.title = 'filter';
+            filterTest.fun = function() {
+                const arr = startup.filter((item) => Math.abs(item) === item);   
+            }
+            const tests = [forTest, filterTest];
+    
+            const suite = new Benchmark.Suite;
+            for(let i = 0; i < tests.length; i++) {
+                suite.add(tests[i].title, tests[i].fun);
+            }
+            suite.on('cycle', function(event) {
+                const el = document.createElement('li');
+                el.textContent = event.target;
+                el.id = event.target.name;
+                appendEl.appendChild(el);
+            })
+            .on('complete', function() {
+                const fastest = this.filter('fastest').map('name');
+                document.getElementById(fastest[0]).style.backgroundColor = 'green';
+            })
+            .run({ 'async': true });
+        </script>
+    </body>
+</html>

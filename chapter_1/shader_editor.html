@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<head></head>
+<body>
+    <canvas id="myCanvas"></canvas>
+</body>
+<script type="fragment" id="fragment">
+    precision mediump float;
+    void main() {
+        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+</script>
+<script type="vertex" id="vertex">
+    attribute vec4 vPos;
+
+    void main() {
+        gl_Position = vPos;
+    }
+</script>
+<script type="text/javascript">
+    const initVertBuffer = function(context) {
+        const posBuf = context.createBuffer();
+        context.bindBuffer(context.ARRAY_BUFFER, posBuf);
+        const positions = [
+            -1.0, 1.0,
+            1.0, 1.0,
+            -1.0, -1.0,
+            1.0, -1.0
+        ];
+
+        context.bufferData(context.ARRAY_BUFFER,
+            new Float32Array(positions),
+            context.STATIC_DRAW);
+        
+        return posBuf;
+    }
+
+    const canvas = document.getElementById('myCanvas');
+    const context = canvas.getContext('webgl');
+
+    context.clearColor(0.0, 0.0, 0.0, 1.0);
+    context.clearDepth(1.0);
+    context.enable(context.DEPTH_TEST);
+    context.depthFunc(context.LEQUAL);
+    context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+
+    // grab the vertex shader and compile it
+    const vertexSource = document.getElementById('vertex').text;
+    const vertex = context.createShader(context.VERTEX_SHADER);
+    context.shaderSource(vertex, vertexSource);
+    context.compileShader(vertex);
+    let success = context.getShaderParameter(vertex, context.COMPILE_STATUS);
+    if(!success ) {
+        throw "could not compile vertex shader";
+    }
+    // grab the fragment shader and compile it
+    const fragmentSource = document.getElementById('fragment').text;
+    const fragment = context.createShader(context.FRAGMENT_SHADER);
+    context.shaderSource(fragment, fragmentSource);
+    context.compileShader(fragment);
+    success = context.getShaderParameter(fragment, context.COMPILE_STATUS);
+    if(!success ) {
+        throw "could not compile fragment shader";
+    }
+    // now lets create the program and attach them
+    const program = context.createProgram();
+    context.attachShader(program, vertex);
+    context.attachShader(program, fragment);
+    context.linkProgram(program);
+    success = context.getProgramParameter(program, context.LINK_STATUS);
+    if(!success ) {
+        throw "unable to link program to gl context";
+    }
+
+    const info = {
+        program: program,
+        attributeLocations: {
+            vPos: context.getAttribLocation(program, 'vPos')
+        }
+    };
+    
+    {
+        const numComponents = 2;
+        const type = context.FLOAT;
+        const normalize = false;
+        const stride = 0;
+        const offset = 0;
+        context.bindBuffer(context.ARRAY_BUFFER, initVertBuffer(context));
+        context.vertexAttribPointer(
+            info.attributeLocations.vPos,
+            numComponents,
+            type,
+            normalize,
+            stride,
+            offset
+        );
+        context.enableVertexAttribArray(info.attributeLocations.vPos);
+    }
+
+    context.useProgram(program);
+    const offset = 0;
+    const vertexCount = 4;
+
+    // our actual loop
+    const loop = function() {
+        context.drawArrays(context.TRIANGLE_STRIP, offset, vertexCount);
+        requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+</script>
+</html>

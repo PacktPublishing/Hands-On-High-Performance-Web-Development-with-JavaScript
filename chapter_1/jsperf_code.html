@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<head></head>
+<body></body>
+<script type="text/javascript">
+    const arr = new Array(100000);
+    for(let i = 0; i < arr.length; i++) {
+        if( i % 2 ) {
+            arr[i] = i;
+        } else {
+            arr[i] = -i;
+        }
+    }
+
+    const nArr = [];
+    for(let i = 0; i < arr.length; i++) {
+        if(Math.abs(arr[i]) === arr[i]) {
+            nArr.push(arr[i]);
+        }
+    }
+
+
+    const reducer = function(item) {
+        return Math.abs(item) === item;
+    }
+    const nArr2 = arr.filter(reducer);
+</script>
+</html>
