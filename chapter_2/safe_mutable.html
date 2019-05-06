@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+    <head>
+    </head>
+    <body>
+        <script type="text/javascript">
+            const state = {};
+            (function(scope) {
+                const _state = {},
+                      getNestedProperty = function(key) {
+                          const tempArr = key.split('.');
+                          let temp = _state;
+                          while( tempArr.length > 1 ) {
+                              temp = temp[tempArr.shift()];
+                              if( temp === undefined ) {
+                                  throw new Error('Unable to find key!');
+                              }
+                          }      
+                          return {obj : temp, finalKey : tempArr[0] };
+                      },
+                      checkPrimitives = function(item) {
+                          return item === null || typeof item === 'string' || typeof item === 'number' || typeof item === 'undefined';
+                      },
+                      cloneFunction = function(fun, scope=null) {
+                          return fun.bind(scope);
+                      },
+                      cloneObject = function(obj) {
+                          const newObj = {};
+                          const keys = Object.keys(obj);
+                          for(let i = 0; i < keys.length; i++) {
+                              const key = keys[i];
+                              const item = obj[key];
+                              newObj[key] = runUpdate(item);
+                          }
+                          return newObj;  
+                      },
+                      cloneArray = function(arr) {
+                          const newArr = new Array(arr.length);
+                          for(let i = 0; i < arr.length; i++) {
+                              newArr[i] = runUpdate(arr[i]);
+                          }
+                          return newArr;
+                      },
+                      runUpdate = function(item) {
+                          return checkPrimitives(item) ? 
+                                    item :
+                                 typeof item === 'function' ? 
+                                    cloneFunction(item) :
+                                 item instanceof Array ?
+                                    cloneArray(item) :
+                                    cloneObject(item);
+                      };
+
+                scope.update = function(obj) {
+                    const x = Object.keys(obj);
+                    for(let i = 0; i < x.length; i++) {
+                        _state[x[i]] = runUpdate(obj[x[i]]);
+                    }
+                }
+
+                scope.set = function(key, val) {
+                    const {obj, finalKey} = getNestedProperty(key);
+                    obj[finalKey] = val; 
+                }
+
+                scope.get = function(key) {
+                    const {obj, finalKey} = getNestedProperty(key);
+                    return obj[finalKey]
+                }
+
+                scope.getAll = function() {
+                    return Object.assign({}, _state);
+                }
+            })(state);
+            Object.freeze(state);
+
+            state.update({a : 10, b : 20, c : 30});
+            console.log('state', state.get('a'));
+            state.set('a', 20);
+            console.log('state', state.get('a'));
+            state.update({b : 15, c : 40});
+
+            var _a = state.getAll();
+            _a.a = 15;
+            console.log(state.getAll());
+
+            Array.prototype._map = function(fun) {
+                if( typeof fun !== 'function' ) {
+                    return null;
+                }
+                const arr = new Array(this.length);
+                for(let i = 0; i < this.length; i++) {
+                    arr[i] = fun(this[i]);
+                }
+                return arr;
+            }
+
+            Array.prototype._reduce = function(fun, initial=null) {
+                if( typeof fun !== 'function' ) {
+                    return null;
+                }
+                let val = initial ? initial : this[0];
+                const startIndex = initial ? 0 : 1;
+                for(let i = startIndex; i < this.length; i++) {
+                    val = fun(val, this[i], i, this);
+                }
+                return val;
+            }
+
+            const x = new Array(100000);
+            for(let i = 0; i < x.length; i++) {
+                x[i] = i + 1;
+            }
+
+            console.time('mutable');
+            const y = x._reduce((acc, item) => acc += item ** 2 , 0);
+            console.timeEnd('mutable');
+
+            console.time('immutable');
+            const z = x.reduce((acc, item) => acc += item ** 2, 0);
+            console.timeEnd('immutable');
+
+            const ReaderWriter = function() {
+                let data = {};
+                let readers = 0;
+                let readyForSet = new CustomEvent('readydata');
+                console.log('this', this);
+                this.getData = function() {
+                   readers += 1;
+                   return data;
+                }
+                this.releaseData = function() {
+                    if( readers ) {
+                        readers -= 1;
+                        if(!readers) {
+                            document.dispatchEvent(readyForSet);
+                        }
+                    }
+                    return readers;
+                }
+                this.setData = function(d) {
+                    return new Promise((resolve, reject) => {
+                        if(!readers ) {
+                            data = d;
+                            resolve(true);
+                        } else {
+                            document.addEventListener('readydata', function(e) {
+                                data = d;
+                                resolve(true);
+                            }, { once : true} );
+                        }
+                    })
+
+                }
+            }
+        </script>
+    </body>
+</html>

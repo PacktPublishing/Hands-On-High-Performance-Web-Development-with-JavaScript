@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+    <head></head>
+    <body>
+        <script type="text/javascript">
+            const obj = { item : 'thing', another : {that : 'this'}, what : ['yes', 'no']};
+            const arr = [{item : '1', thing : 'another'}, {item : '2', thing : 'another2'}];
+
+            const newObj = Object.assign({}, obj);
+            const newArr = [...arr];
+
+            newObj.another.that = 'what changed?';
+            newArr[0].item = '3';
+
+            console.log('object references', obj.another.that, newObj.another.that);
+            console.log('array references', arr[0].item, newArr[0].item);
+
+
+            const obj2 = {item : 'thing', another : 'what'};
+            const arr2 = ['yes', 'no', 'nope'];
+
+            const newObj2 = Object.assign({}, obj2);
+            const newArr2 = [...arr2];
+
+            newObj2.item = 'changed';
+            newArr2[0] = 'nada';
+
+            console.log('single level object copy', obj2, newObj2);
+            console.log('single level array copy', arr2, newArr2);
+        </script>
+    </body>
+</html>

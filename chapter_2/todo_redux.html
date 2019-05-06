@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+    <head>
+        <script type="text/javascript" src="./redux.min.js"></script>
+        <style>
+            .completed {
+                text-decoration : line-through;
+            }
+            .hide {
+                display : none;
+            }
+        </style>
+    </head>
+    <body>
+        <ul id="todo"></ul>
+        <input id="input" type="text" placeholder="Enter Todo Item" />
+        <input id="year" type="number" placeholder="Year" />
+        <input id="month" type="number" placeholder="Month" />
+        <input id="day" type="number" placeholder="Day" />
+        <button id="add">Add</button>
+        <br/>
+        <br/>
+        <button id="SHOW_ALL">All</button>
+        <button id="SHOW_COMPLETED">Completed</button>
+        <button id="SHOW_ACTIVE">Active</button>
+        <button id="SHOW_OVERDUE">Overdue</button>
+        <button id="UPDATE_LAST_YEAR">Update Last Item Year</button>
+        <input type="number" id="updateYear" placeholder="Year" />
+        <script type="text/javascript">
+        (function() {
+            // create our constants
+            const ACTIONS = {
+                ADD_TODO : 'ADD_TODO', 
+                TOGGLE_TODO : 'TOGGLE_TODO',
+                SET_VISIBILITY_FILTER : 'SET_VISIBILITY_FILTER',
+                UPDATE_LAST_YEAR : 'UPDATE_LAST_YEAR'
+            }
+            Object.seal(ACTIONS);
+            const visibilityFilters = {
+                SHOW_ALL : 'SHOW_ALL',
+                SHOW_COMPLETED : 'SHOW_COMPLETED',
+                SHOW_ACTIVE : 'SHOW_ACTIVE',
+                SHOW_OVERDUE : 'SHOW_OVERDUE'
+            };
+            Object.seal(visibilityFilters);
+
+            // our actions for Redux
+            const addTodo = function(text, date) {
+                return { type : ACTIONS.ADD_TODO, text, date};
+            }
+            const toggleTodo = function(index) {
+                return { type : ACTIONS.TOGGLE_TODO, index };
+            }
+            const setVisibilityFilter = function(filter) {
+                return { type : ACTIONS.SET_VISIBILITY_FILTER, filter };
+            }
+
+            // our reducers
+            const visibilityFilter = function(state = 'SHOW_ALL', action) {
+                switch(action.type) {
+                    case 'SET_VISIBILITY_FILTER': {
+                        return action.filter;
+                    }
+                    default: {
+                        return state;
+                    }
+                }
+            }
+
+            const todo = function(state = [], action) {
+                switch(action.type) {
+                    case 'ADD_TODO': {
+                        return [
+                            ...state,
+                            {
+                                text : action.text,
+                                date : action.date,
+                                completed : false
+                            }
+                        ]
+                    }
+                    case 'UPDATE_LAST_YEAR': {
+                        const prevState = state;
+                        const tempObj = Object.assign({}, state[state.length - 1].date);
+                        tempObj.year = action.year;
+                        state[state.length - 1].date = tempObj;
+                        return [...state];
+                    }
+                    case 'TOGGLE_TODO': {
+                        return state.map((todo, index) => {
+                            if( index === action.index ) {
+                                return Object.assign({}, todo, {
+                                    completed : !todo.completed
+                                })
+                            }
+                            return todo;
+                        });
+                    }
+                    default : {
+                        return state;
+                    }
+                }
+            }
+
+            // create our store
+            const reducer = Redux.combineReducers({ visibilityFilter, todo });
+            const store = Redux.createStore(reducer);
+
+            // our main loop logic based off of actions
+            let prevState = store.getState();
+            const container = document.getElementById('todo');
+            store.subscribe(() => {
+                const state = store.getState();
+                if( prevState === state ) {
+                    return;
+                }
+                    // first type of actions ADD_TODO
+                if( prevState.todo.length !== state.todo.length ) {
+                    container.appendChild(createTodo(state.todo[state.todo.length - 1].text, state.todo[state.todo.length - 1].date));
+                    // second type of action UPDATE_LAST_YEAR
+                } else if( prevState.todo.map((item) => item.date.year ) !== state.todo.map((item) => item.date.year ) ) {
+                    console.log('we should hit this');
+                } // third type of action SET_VISIBILITY_FILTER
+                else if( prevState.visibilityFilter !== state.visibilityFilter ) {
+                    setVisibility(container.children, state);
+                    // final type of action TOGGLE_TODO
+                } else {
+                    const todos = container.children;
+                    for(let i = 0; i < todos.length; i++) {
+                        if( state.todo[i].completed ) {
+                            todos[i].classList.add('completed');
+                        } else {
+                            todos[i].classList.remove('completed');
+                        }
+                    }
+                }
+                prevState = state;
+            });
+
+            // once an item is added to the store we can actually add it to our DOM
+            const createTodo = function(msg=null, date=null) {
+                if(!msg ) {
+                    return console.error('need to provide a message!');
+                }
+                const tempEl = document.createElement('li');
+                const msgEl = document.createElement('span');
+                const dateEl = document.createElement('span');
+                const msgChange = document.createElement('input');
+                msgChange.type = 'number';
+                msgChange.placeholder = 'Year';
+                const changeBtn = document.createElement('button');
+                changeBtn.textContent = 'Change';
+                changeBtn.onclick = function(ev) {
+                    store.dispatch({ type : 'UPDATE_TODO', year : msgChange.value });
+                } 
+                msgEl.textContent = msg;
+                dateEl.textContent = `${date.year}/${date.month}/${date.day}`;
+                const check = document.createElement('input');
+                check.type = 'checkbox';
+                check.onchange = function(ev) {
+                    let i = 0,
+                        child = tempEl;
+                    while((child = child.previousSibling) !== null) { i+= 1; }
+
+                    // redux state toggle
+                    store.dispatch(toggleTodo(i));
+                }
+
+                tempEl.appendChild(msgEl);
+                tempEl.appendChild(dateEl);
+                tempEl.appendChild(check);
+                tempEl.appendChild(msgChange);
+                tempEl.appendChild(changeBtn);
+                
+                return tempEl;
+            }
+
+            // dumb implementation of visibility. Should compare previous state and current
+            // but this will work for demonstration purposes
+            const setVisibility = function(todos, state) {
+                const currDay = new Date();
+                for(let i = 0; i < state.todo.length; i++) {
+                        switch( state.visibilityFilter ) {
+                            case visibilityFilters.SHOW_ALL: {
+                                todos[i].classList.remove('hide');
+                                break;
+                            }
+                            case visibilityFilters.SHOW_COMPLETED: {
+                                if( state.todo[i].completed ) {
+                                    todos[i].classList.remove('hide');
+                                } else {
+                                    todos[i].classList.add('hide');
+                                }
+                                break;
+                            }
+                            case visibilityFilters.SHOW_ACTIVE: {
+                                if(!state.todo[i].completed ) {
+                                    todos[i].classList.remove('hide');
+                                } else {
+                                    todos[i].classList.add('hide');
+                                }
+                                break;
+                            }
+                            case visibilityFilters.SHOW_OVERDUE: {
+                                const currTodo = state.todo[i];
+                                const tempTime = currTodo.date;
+                                const tempDate = new Date(`${tempTime.year}/${tempTime.month}/${tempTime.day}`);
+                                if( tempDate < currDay  &&
+                                   !currTodo.completed ) {
+                                    todos[i].classList.remove('hide');
+                                } else {
+                                    todos[i].classList.add('hide');
+                                }
+                            }
+                        }
+                    }
+            }
+
+            // setup our filters and their click event handlers
+            const vis = Object.keys(visibilityFilters);
+            for(let i = 0; i < vis.length; i++) {
+                const el = document.getElementById(vis[i]);
+                el.onclick = function(ev) {
+                    store.dispatch(setVisibilityFilter(el.id));
+                }
+            }
+
+            document.getElementById('UPDATE_LAST_YEAR').onclick = function(ev) {
+                store.dispatch({ type : ACTIONS.UPDATE_LAST_YEAR, year : document.getElementById('updateYear').value});
+            }
+
+            // setup our add button for the store
+            document.getElementById('add').onclick = function(ev) {
+                const input = document.getElementById('input');
+                const year = document.getElementById('year');
+                const month = document.getElementById('month');
+                const day = document.getElementById('day');
+                store.dispatch(addTodo(input.value, {year : year.value, month : month.value, day : day.value}));
+                year.value = "";
+                month.value = "";
+                day.value = "";
+                input.value = "";
+            }
+        })();
+        </script>
+    </body>
+</html>

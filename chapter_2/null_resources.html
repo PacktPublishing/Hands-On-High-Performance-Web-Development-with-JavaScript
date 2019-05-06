@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<head></head>
+<body>
+    <input type="text" id="data" />
+    <button id="submit">Get hashes</button>
+    <div id="container">
+        <h2>The hashed value is: </h2>
+        <ul id="output"></ul>
+    </div>
+    <script type="text/javascript">
+        const addReadableProperty = function(item) {
+            Object.defineProperty(item, 'readonly', {
+                value : true,
+                writable : false
+            });
+            return item;
+        }
+
+        const getData = function() {
+            return document.getElementById('container').value;
+        };
+        const encodeData = function(data) {
+            let te = new TextEncoder();
+            return te.encode(data);
+        }
+        const hashData = function(algorithm) {
+            let str = getData();
+            let finData = encodeData(str);
+            str = null;
+            return crypto.subtle.digest(algorithm, finData);
+        }
+        const showHashData = function(parent, algorithm) {
+            const newEl = document.createElement('li');
+            hashData(algorithm).then((res) => {
+                let te = new TextDecoder();
+                newEl.textContent = te.decode(res);
+                if(!parent.readonly ) {
+                    parent.append(newEl);
+                }
+            });
+        }
+
+        {
+            let but = document.getElementById('submit');
+            but.onclick = function(ev) {
+                const algos = ['SHA-1', 'SHA-256', 'SHA-384', 'SHA-512'];
+                const out = document.getElementById('output');
+                addReadableProperty(out);
+                for(let i = 0; i < algos.length; i++) {
+                    showHashData(out, algos[i]);
+                }
+                
+            }
+            but = null;
+        }
+    </script>
+</body>
+</html>

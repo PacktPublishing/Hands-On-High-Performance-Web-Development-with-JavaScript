@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+    <head>
+        <script type="text/javascript" src="./immutable.min.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+        (function() {
+            // {
+            //     const fillArr = new Array(10001);
+            //     const rowLen = 40;
+            //     for(let i = 0; i < fillArr.length; i++) {
+            //         const temp = new Array(rowLen);
+            //         for(let j = 0; j < rowLen; j++) {
+            //             if( i === 0 ) {
+            //                 temp[j] = `key${j}`;
+            //             } else {
+            //                 temp[j] = i;
+            //             }
+            //         }
+            //         fillArr[i] = temp;
+            //     }
+            //     // array of arrays to objects
+            //     // 1) using regular system
+            //     const fArr = new Array(fillArr.length - 1);
+            //     const rowSize = fillArr[0].length;
+            //     const keys = new Array(rowSize);
+            //     for(let i = 0; i < rowSize; i++) {
+            //         keys[i] = fillArr[0][i];
+            //     }
+            //     for(let i = 1; i < fillArr.length; i++) {
+            //         const obj = {};
+            //         for(let j = 0; j < rowSize; j++) {
+            //             obj[keys[j]] = fillArr[i][j];
+            //         }
+            //     }
+            
+
+
+            //     // 2) using immutable js
+            //     const l = Immutable.List(fillArr);
+            //     const _k = Immutable.List(fillArr[0]);
+            //     const tfinal = l.map((val, index) => {
+            //         if(!index ) return;
+            //         return Immutable.Map(_k.zip(val));
+            //     });
+            //     const final = tfinal.shift();
+            // }
+            {
+                const tempArr = new Array(100000);
+                for(let i = 0; i < tempArr.length; i++) {
+                    if( Math.random() < 0.4 ) {
+                        tempArr[i] = 'wrong';
+                    } else {
+                        tempArr[i] = i;
+                    }
+                }
+
+                // we are going to search through and see if the i matches up with the value, if not we need to replace it
+                console.time('mutable');
+                const mutArr = Array.apply([], tempArr);
+                const errs = [];
+                for(let i = 0; i < mutArr.length; i++) {
+                    if( mutArr[i] !== i ) {
+                        errs.push(`Error at loc ${i}. Value : ${mutArr[i]}`);
+                        mutArr[i] = i;
+                    }
+                }
+                console.timeEnd('mutable');
+                console.log(errs);
+
+                console.time('mutable2');
+                const mut2Arr = Array.apply([], tempArr);
+                const errs2 = [];
+                const fArr = mut2Arr.map((val, index) => {
+                    if( val !== index ) {
+                        errs2.push(`Error at loc ${index}. Value : ${val}`);
+                        return index;
+                    }
+                    return val;
+                });
+                console.timeEnd('mutable2');
+                console.log(errs);
+
+                console.time('immutable');
+                const immArr = Immutable.List(tempArr);
+                const ierrs = [];
+                const corrArr = immArr.map((item, index) => { 
+                    if( item !== index ) {
+                        ierrs.push(`Error at loc ${index}. Value : ${item}`);
+                        return index;
+                    } 
+                    return item;
+                });
+                console.timeEnd('immutable');
+                console.log(errs);
+            }
+        })();
+            
+        </script>
+    </body>
+</html>
