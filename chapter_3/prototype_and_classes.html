@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<head></head>
+<body>
+    <script type="text/javascript">
+        const Item = function() {
+            this.a = 1;
+            this.b = 'this';
+            this.c = function() {
+                console.log('this is going to be a new function each time');
+            }
+        }
+        Item.prototype.d = function() {
+            console.log('this is on the prototype so it will only be here once');
+        }
+        Item.e = function() {
+            console.log(this);
+        }
+        Item.f = 10;
+
+        const item1 = new Item();
+        const item2 = new Item();
+
+        item1.c === item2.c; //this will be false
+        item1.d === item2.d; //this will be true
+        
+        const item3 = new (Object.getPrototypeOf(item1)).constructor();
+        item3.d === item2.d; //will be true
+        Object.getPrototypeOf(item1).constructor === Item; // will be true
+
+        class newItem {
+            constructor() {
+                this.c = function() {
+                    console.log('this is going to be a new function each time');
+                }
+            };
+            #h = 10;
+            _g  = 'what';
+            // g = 'what';
+            a = '1';
+            b = 'this';
+            d() {
+                console.log('this is on the prototype so it will only be here once');
+            }
+
+            static e() {
+                console.log(this);
+            }
+
+            static f = 10;
+
+            get g() {
+                return this._g;
+            }
+            set g(val) {
+                if( typeof val !== 'string' ) {
+                    return;
+                } 
+                this._g = val;
+            }
+
+            get h() {
+                return this.#h;
+            }
+        }
+
+        const newItem1 = new newItem();
+        const newItem2 = new newItem();
+
+        newItem1.c === newItem2.c //will be false
+        newItem1.d === newItem2.d //will be true
+
+        newItem === Object.getPrototypeOf(newItem1).constructor;
+
+        // newItem1.e() //will throw TypeError
+        newItem.e() //will give us the class
+        newItem.f // will give us the number 10
+
+        const Public = (function() {
+            let priv = 0;
+            const Private = function() {
+            }
+            Private.prototype.add1 = function() {
+                priv += 1;
+            }
+            Private.prototype.getVal = function() {
+                return priv;
+            }
+            return Private;
+        })();
+
+        class extendedNewItem extends newItem {
+            constructor() {
+                super();
+                console.log(this.c());
+            }
+            get super_h() {
+                return super.h;
+                //console.log(super.#h);
+            }
+
+            static e() {
+                super.e();
+                console.log('this came from our extended class');
+            }
+        }
+        const extended = new extendedNewItem();
+
+        class extendedExtendedNewItem extends extendedNewItem {
+            constructor() {
+                super();
+                super.super();
+            }
+        }
+        const extendedExtended = new extendedExtendedNewItem()
+    </script>
+</body>
+</html>

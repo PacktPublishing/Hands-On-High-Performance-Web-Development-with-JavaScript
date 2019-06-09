@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<head>
+    <style>
+        h1 {
+            color : red;
+            background : blue;
+        }
+        p {
+            color : green;
+            background : purple;
+            padding : 15px;
+        }
+    </style>
+</head>
+<body>
+    <p>This is a paragraph element</p>
+    <ul id="main">
+        <li class="hidden">1</li>
+        <li class="hidden">2</li>
+        <li>3</li>
+        <li class="hidden">4</li>
+        <li>5</li>
+    </ul>
+
+    <input type="text" />
+    <input type="password" />
+    <input type="text" />
+    <input type="submit" />
+
+    <ul id="add"></ul>
+
+    <div id="shadowHolder"></div>
+    <script type="module">
+        const main = document.getElementById('main');
+        const hidden = document.getElementsByClassName('hidden');
+
+        const newMain = document.querySelector('#main');
+        const newHidden = document.querySelectorAll('.hidden');
+
+        const allTextInput = Array.from(document.getElementsByTagName('input'))
+            .filter(item => item.getAttribute('type') === "text");
+
+        const alsoTextInput = document.querySelectorAll('input[type="text"]');
+
+        const moreHidden = document.querySelector('#main').querySelectorAll('.hidden');
+
+        
+        const num = 10000;
+        const container = document.querySelector('#add');
+        for(let i = 0; i < num; i++) {
+            const temp = document.createElement('li');
+            temp.textContent = `item ${i}`;
+            container.appendChild(temp);
+        }
+        while(container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
+
+        const fragment = document.createDocumentFragment();
+        for(let i = 0; i < num; i++) {
+            const temp = document.createElement('li');
+            temp.textContent = `item ${i}`;
+            fragment.appendChild(temp);
+        }
+        container.appendChild(fragment);
+
+        const shadow = document.querySelector('#shadowHolder').attachShadow({mode : 'open'});
+        const style = document.createElement('style');
+        style.textContent = `
+            h1 {
+                font-size : 1.2rem;
+                color : #333;
+                background : #aaa;
+            }
+            p {
+                font-size : 0.9rem;
+                color : #555;
+                background : #ccc;
+            }
+        `
+        const frag = document.createDocumentFragment();
+        const header = document.createElement('h1');
+        const par = document.createElement('p');
+        header.textContent = 'This is a header';
+        par.textContent = 'Here is some text inside of a paragraph element. It is going to get the styles that we outlined above';
+
+        frag.appendChild(header);
+        frag.appendChild(par);
+
+        shadow.appendChild(style);
+        shadow.appendChild(frag);
+    </script> 
+</body>
+</html>

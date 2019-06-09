@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<head></head>
+<template id="tooltip">
+    <style>
+        .wrapper {
+            border : 1px solid black;
+            background : white;
+            display : inline-block;
+            position : absolute;
+        }
+        .hidden {
+            display : none !important;
+        }
+        .wrapper > span {
+            padding : 5px;
+            font-size : 1.2rem;
+            color : black;
+            margin : 0;
+        }
+    </style>
+    <span class="wrapper hidden" x="0" y="0" type="default" show="false">
+        <span id="icon">&#x2709</span>
+        <span id="main"><slot name="main_text">This some default text!</slot></span>
+    </span>
+</template>
+<body>
+    <our-tooltip show="true" x="100" y="100" type="success">
+        <span slot="main_text">That was a successful operation!</span>
+    </our-tooltip>
+    <script type="module">
+        class Tooltip extends HTMLElement {
+            constructor() {
+                super();
+                this.type = this.getAttribute('type');
+                this.typeMap = new Map(Object.entries({
+                    'success' : "&#x2714",
+                    'error' : "&#x2716",
+                    'info' : "&#x2755",
+                    'default' : "&#x2709"
+                }));
+                const template = document.querySelector('#tooltip').content;
+                this.shadow = this.attachShadow({mode : 'open'})
+                this.shadow.appendChild(template.cloneNode(true));
+            }
+            update() {
+                const x = this.getAttribute('x');
+                const y = this.getAttribute('y');
+                const type = this.getAttribute('type');
+                const show= this.getAttribute('show');
+                const wrapper = this.shadow.querySelector('.wrapper');
+                
+                if( show === 'true' ) {
+                    wrapper.classList.remove('hidden');
+                } else {
+                    wrapper.classList.add('hidden');
+                }
+                this.shadow.querySelector('#icon').innerHTML = this.getType(type);
+                wrapper.style.left = `${x}px`;
+                wrapper.style.top = `${y}px`;
+            }
+            getType(type) {
+                return type ? 
+                    this.typeMap.has(type) ? 
+                        this.typeMap.get(type) : 
+                        this.typeMap.get('default') :
+                    this.typeMap.get('default');
+            }
+            connectedCallback() {
+                this.update(this);
+            }
+            attributeChangedCallback(name, oldValue, newValue) {
+                this.update(this);
+            }
+            static get observedAttributes() {
+                return ['x', 'y', 'type', 'text', 'show'];
+            }
+        }
+
+        customElements.define('our-tooltip', Tooltip);
+    </script>
+</body>
+</html>

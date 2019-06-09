@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<head>
+</head>
+<body>
+    <ul id="content">
+    </ul>
+    <script type="text/javascript">
+        const set = function(...items) {
+            this._arr = [...items];
+            this.add = function(item) {
+                if( this._arr.includes(item) ) {
+                    return false;
+                }
+                this._arr.push(item);
+                return true;
+            }
+            this.has = function(item) {
+                return this._arr.includes(item);
+            }
+            this.values = function() {
+                return this._arr;
+            }
+            this.clear = function() {
+                this._arr = [];
+            }
+        }
+
+        const myset = new set('item1', 'item2', 'item3');
+        console.log(myset.add('item4'));
+        console.log(myset.add('item3'));
+        console.log(myset.has('item2'));
+        console.log(myset.has('what'));
+        console.log(myset.values());
+        myset.clear();
+        console.log(myset.values());
+
+        const data = new Array(10000000);
+        for(let i = 0; i < data.length; i++) {
+            data[i] = i;
+        }
+        const setData = new Set();
+        for(let i = 0; i < data.length; i++) {
+            setData.add(i);
+        }
+        
+        data.includes(5000000)
+        setData.has(5000000);
+
+
+        const map = new Map();
+        for(let i = 0; i < 10000; i++) {
+            map.set(`${i}item`, i);
+        }
+        map.forEach((val, key) => console.log(val));
+        map.size;
+        map.has('0item');
+        map.clear();
+
+        const items = new Map();
+        const container = document.getElementById('content');
+        for(let i = 0; i < 50000; i++) {
+            const el = document.createElement('li');
+            el.textContent = `we are element ${i}`;
+            el.onclick = function(ev) {
+                console.log(items.get(el));
+            }
+            items.set(el, i);
+            container.appendChild(el);
+        }
+        const removeHalf = function() {
+            for(let i = 0; i < container.children.length; i++) {
+                if( i % 2 ) { container.removeChild(container.children[i]) };
+            }
+        }
+
+        const a = {item1 : b};
+        const b = {item1 : a};
+    </script>
+</body>
+</html>

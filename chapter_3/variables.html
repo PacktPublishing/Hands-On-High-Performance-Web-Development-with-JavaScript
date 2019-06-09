@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<head></head>
+<body>
+    <script type="text/javascript">
+        var state = {};
+        var fun = function() {
+            for(var i = 0; i < 10; i++) {
+                state['this'] += ' what';
+            }
+            console.log('i', i);
+        }
+        fun();
+
+        let x = 10;
+        const fun2 = function() {
+            {
+                let x = 20;
+                console.log('inner scope x', x);
+            }
+            console.log('outer scope x', x);
+            x += 10;
+            console.log('this should be 20', x);
+        }
+        //fun2()
+        
+    </script>
+</body>
+</html>

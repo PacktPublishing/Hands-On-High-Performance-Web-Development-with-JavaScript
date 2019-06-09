@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<head>
+</head>
+<body>
+    <script type="text/javascript">
+        const item = new Proxy({}, {
+            get: function(obj, prop) {
+                console.log('getting the following property', prop);
+                return Reflect.has(obj, prop) ? obj[prop] : null; 
+            },
+            set: function(obj, prop, value) {
+                console.log('trying to set the following prop with the following value', prop, value);
+                if( typeof value === 'string' ) {
+                    obj[prop] = value;
+                } else {
+                    throw new Error('Value type is not a string!');
+                }
+            }
+        });
+
+        item.one = 'what';
+        item.two = 'is';
+        console.log(item.one);
+        console.log(item.three);
+        //item.three = 12;
+
+        const isPrimitive = function(item) {
+            return typeof item === 'string' ||
+                typeof item === 'number' ||
+                typeof item === 'boolean';
+        } 
+        const item2 = Proxy.revocable({}, {
+            get: function(obj, prop) {
+                console.log('we are trying to get the following property', prop);
+                return Reflect.has(obj, prop) ? obj[prop] : null;
+            },
+            set: function(obj, prop, value) {
+                console.log('trying to set the following prop with the following value', prop, value);
+                if( isPrimitive(value) ) {
+                    obj[prop] = value;
+                } else {
+                    throw new Error('Value type is not a primitive!');
+                }
+            }
+        });
+
+        const item2Proxy = item2.proxy;
+
+        item2Proxy.one = 'this';
+        item2Proxy.two = 12;
+        item2Proxy.three = true;
+        item2.revoke();
+        // (function(obj) {
+        //     console.log(obj.one);
+        // })(item2Proxy);
+        
+        Math.max.apply(null, [1, 2, 3]);
+        Reflect.apply(Math.max, null, [1,2,3]);
+
+        item3 = {};
+        if( Reflect.set(item3, 'yep', 12) ) { 
+            console.log('value was set correctly'); 
+        } else {
+            console.log('value was not set!');
+        }
+        Reflect.defineProperty(item3, 'readonly', {value : 42});
+        if( Reflect.set(item3, 'readonly', 'nope') ) {
+            console.log('we set the value');
+        } else {
+            console.log('value should not be set!');
+        }
+    </script>
+</body>
+</html>

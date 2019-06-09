@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+    <head></head>
+    <body>
+        <button id="loader">Loader</button>
+        <script type="module">
+            const imported = {};
+            import { Item as _item } from './lib.js';
+
+            const code = function() {
+                console.log('here is some code and now we can no longer use modules');
+            }
+            code();
+
+            document.querySelector('#loader').addEventListener('click', (ev) => {
+                if(!('./lib2.js' in imported)) {
+                    import('./lib2.js')
+                    .then((module) => {
+                        imported['./lib2.js'] = module;
+                        module.default();
+                    });
+                } else {
+                    imported['./lib2.js'].default()
+                }
+            })
+
+            console.log(_item);
+        </script>
+    </body>
+</html>

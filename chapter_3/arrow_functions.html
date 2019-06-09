@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<head>
+</head>
+<body>
+    <script type="text/javascript">
+        const create = function() {
+            this.x = 10;
+            console.log('this', this);
+            const innerFun = function() {
+                console.log('inner this', this);
+            }
+            const innerArrowFun = () => {
+                console.log('inner arrow this', this);
+            }
+            innerFun();
+            innerArrowFun();
+        }
+        const item = new create();
+    </script>
+</body>
+</html>

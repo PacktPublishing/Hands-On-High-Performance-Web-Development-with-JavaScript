@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<head></head>
+<body>
+    <div id="content"></div>
+    <button id="stop">Stop Download</button>
+    <script type="module">
+        const url = "http://localhost:8081/sample";
+
+        // const makeRequest = function(loc, success, failure) {
+        //     const oldReq = new XMLHttpRequest();
+        //     oldReq.addEventListener("load", function(ev) {
+        //         if( ev.target.status === 200 ) {
+        //             success(ev.target.response);
+        //         } else {
+        //             failure(ev.target.response);
+        //         }
+        //     }, {once : true});
+        //     oldReq.open("GET", loc);
+        //     oldReq.setRequestHeader("Accept", "application/json");
+        //     oldReq.responseType = "json";
+        //     oldReq.send();
+        // }
+
+        // makeRequest(
+        //     url, 
+        //     (res) => {
+        //         document.querySelector('#content').innerHTML = JSON.stringify(res);
+        //     }, 
+        //     (err) => {
+        //         document.querySelector('#content').innerHTML = err;
+        //     }
+        // );
+
+        // fetch("http://localhost:8081/sample")
+        // .then((res) => res.json())
+        // .then((res) => {
+        //     document.querySelector('#content').innerHTML = JSON.stringify(res);
+        // }).catch((err) => {
+        //     document.querySelector('#content').innerHTML = err;
+        // });
+        // (async function() {
+        //     const res = await fetch("http://localhost:8081/sample");
+        //     const final = await res.json();
+        //     document.querySelector('#content').innerHTML = JSON.stringify(final);
+        // })();
+
+        class Rot13Transform {
+            constructor() {
+                this.te = new TextEncoder();
+            }
+
+            async transform(chunk, controller) {
+                const _chunk = await chunk;
+                const _newChunk = _chunk.map((item) => ((item - 65 + 13) % 26) + 65)
+                controller.enqueue(_newChunk);
+                return;
+            }
+        }
+
+        fetch("http://localhost:8081/rot")
+        .then(response => response.body)
+        .then(rs => rs.pipeThrough(new TransformStream(new Rot13Transform())))
+        .then(rs => new Response(rs))
+        .then(response => response.text())
+        .then(final => document.querySelector('#content').innerHTML = final )
+        .catch(err => console.error(err));
+
+        (async function() {
+            const controller = new AbortController();
+            const signal = controller.signal;
+            document.querySelector('#stop').addEventListener('click', (ev) => {
+                controller.abort();
+            });
+
+            try {
+                const res = await fetch('http://localhost:8081/longload', {signal})
+                const final = await res.text();
+                document.querySelector('#content').innerHTML = final;
+            } catch(e) {
+                console.error('failed to download', e);
+            }
+        })();
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<head></head>
+<body>
+    <ul>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+    <script type="text/javascript">
+        // working with a variable amount of arguments
+        const oldVarArgs = function() {
+            console.log('old variable amount of arguments', arguments);
+        }
+        const varArgs = function(...args) {
+            console.log('variables amount of arguments', args);
+        }
+        // transform HTML list into a basic array so we have acces to array operations
+        const domArr = [...document.getElementsByTagName('li')];
+        // clone an array
+        const oldArr = [1, 2, 3, 4, 5];
+        const clonedArr = [...oldArr];
+        // clone an object
+        const oldObj = {item1 : 'that', item2 : 'this'};
+        const clonedObj = {...oldObj};
+
+        //desctructuring
+        //object
+        const desObj = {item1 : 'what', item2 : 'is', itme3 : 'this'};
+        const {item1, item2} = desObj;
+        console.log(item1, item2);
+
+        //array
+        const arr = [1, 2, 3, 4, 5];
+        const [a, ,b, ...c] = arr;
+        console.log(a, b, c);
+
+        //power op
+        console.log(2 ** 5);
+
+        //parameter defaults
+        const defParams = function(arg1, arg2=null, arg3=10) {
+            if(!arg2) {
+                console.log('nothing was passed in or we passed in a falsy value');
+            }
+            const pow = arg3;
+            if( typeof arg1 === 'number' ) {
+                return arg1 ** pow;
+            } else {
+                throw new TypeError('argument 1 was not a number!');
+            }
+        }
+
+        //string literals
+        const literal = `This is a string literal. It can hold multiple lines and variables
+        by denoting them with curly braces and prepended with the dollar sign like so \$\{\}.
+        here is a value from before: ${a}. We can also pass in arbitrary expressions that 
+        evaluate to a function ${a === 1 ? b : c}.
+        `
+        console.log(literal);
+
+        // typed arrays
+        const arrBuf = new ArrayBuffer(16);
+        const uint8 = new Uint8Array(arrBuf);
+        uint8[0] = 255;
+        console.log(uint8);
+
+        // BigInt
+        const num = Number.MAX_SAFE_INTEGER;
+        console.log('max value', num);
+        console.log('wrapped around', num + 1); //undefined behavior
+
+        const bigInt = 100n;
+        console.log('adding two big ints', 100n + 250n);
+        console.log('add a big int and a regular number', 100n + BigInt(250));
+
+        //Internationalization
+        const amount = 1478.99;
+        console.log(new Intl.NumberFormat('en-UK', {style : 'currency', currency : 'EUR'}).format(amount));
+        console.log(new Intl.NumberFormat('de-DE', {style : 'currency', currency : 'EUR'}).format(amount));
+        const date = new Date(0);
+        console.log(new Intl.DateTimeFormat('en-UK').format(date));
+        console.log(new Intl.DateTimeFormat('de-DE').format(date));
+    </script>
+</body>
+</html>
