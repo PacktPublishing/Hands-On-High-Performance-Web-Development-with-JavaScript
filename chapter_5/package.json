@@ -1,0 +1,16 @@
+{
+    "name" : "Chapter5_import_example",
+    "version" : "0.0.1",
+    "type" : "module",
+    "config" : {
+        "port" : 8080,
+        "name" : "example",
+        "testdata" : {
+            "thing" : 5,
+            "other" : 10
+        }
+    },
+    "scripts" : {
+        "example-script" : "node main.js"
+    }
+}
