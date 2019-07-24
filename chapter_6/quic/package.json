@@ -1,0 +1,9 @@
+{
+    "name": "Chapter5_Quic",
+    "version": "0.0.1",
+    "type": "module",
+    "main": "main.js",
+    "dependencies": {
+        "node-quic": "^0.1.3"
+    }
+}

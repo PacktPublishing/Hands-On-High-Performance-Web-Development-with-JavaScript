@@ -1,0 +1,6 @@
+{
+    "name" : "Chapter5_Local",
+    "version" : "0.0.1",
+    "type" : "module",
+    "main" : "main.js"
+}

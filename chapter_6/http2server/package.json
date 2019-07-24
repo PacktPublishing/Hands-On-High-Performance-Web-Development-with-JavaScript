@@ -1,0 +1,14 @@
+{
+    "name" : "Chapter5_Http2_Server",
+    "version" : "0.0.1",
+    "type" : "module",
+    "main" : "static_server.js",
+    "config" : {
+        "cert" : "server.crt.pem",
+        "key" : "server.key.pem",
+        "static" : "static"
+    },
+    "scripts": {
+        "server" : "node --experimental-modules server.js"
+    }
+}
