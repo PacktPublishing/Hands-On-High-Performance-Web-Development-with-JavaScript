@@ -1,0 +1,8 @@
+{
+    "version": "0.0.1",
+    "type": "module",
+    "name": "protobuf_example",
+    "dependencies": {
+        "protobufjs": "^6.8.8"
+    }
+}

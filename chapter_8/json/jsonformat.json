@@ -1,0 +1,16 @@
+{
+    "name" : "Bob",
+    "birth" : "01/02/1993",
+    "address" : {
+        "zipcode" : 11111,
+        "street" : "avenue of av.",
+        "streetnumber" : 123,
+        "state" : "CA",
+        "country" : "US"
+    },
+    "contact" : {
+        "primary" : "111-222-3333",
+        "secondary" : "444-555-6666",
+        "email" : "bob@bob.com"
+    }
+}

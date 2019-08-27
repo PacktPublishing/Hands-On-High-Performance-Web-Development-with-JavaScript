@@ -1,0 +1,8 @@
+package exampleProtobuf;
+syntax = "proto3";
+
+message TestData {
+    string item1 = 1;
+    int32  item2 = 2;
+    float  item3 = 3;
+}
