@@ -1,0 +1,56 @@
+*, html {
+    margin : 0;
+    padding : 0;
+}
+
+:root {
+    --main-color : "#003A21";
+    --text-color : "#efefef";
+}
+
+/* header styles */
+header {
+    display    : block;
+    height     : 2rem;
+    margin     : 10px 15px;
+    overflow   : hidden;
+    position   : fixed;
+    top        : 0;
+    width      : 100%;
+    background : var(--main-color);
+    color      : var(--text-color);
+}
+header h1 {
+    float : left;
+}
+
+header nav {
+    float : right;
+}
+
+/* Footer styles */
+footer {
+    position : fixed;
+    left : 0;
+    bottom : 0;
+    width : 100%;
+    background : var(--main-color);
+    color  : var(--text-color); 
+}
+footer h2 {
+    float : left;
+}
+footer a {
+    float : right;
+}
+
+/* navbar */
+nav {
+    width : 25%;
+    display : block;
+}
+
+#content {
+    width : 75%;
+    display : block;
+}

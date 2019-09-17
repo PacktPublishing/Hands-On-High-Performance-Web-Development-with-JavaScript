@@ -1,0 +1,19 @@
+{
+    "version": "0.0.1",
+    "name": "microserver",
+    "type": "module",
+    "dependencies": {
+        "remarkable": "^2.0.0"
+    },
+    "config" : {
+        "port" : 50000,
+        "key"  : "selfsignedkey.pem",
+        "certificate" : "selfsignedcertificate.pem",
+        "template" : "template",
+        "bodyfiles" : "publish",
+        "development" : true
+    },
+    "scripts" : {
+        "start": "node --experimental-modules main.js"    
+    }
+}
