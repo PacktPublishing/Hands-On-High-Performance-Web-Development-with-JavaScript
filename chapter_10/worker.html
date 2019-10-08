@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+    <head></head>
+    <body>
+        <input id="in" type="number" />
+        <button id="quit">Stop Workers</button>
+        <p>The primes for the number is: <span id="answer"></span></p>
+
+        <input id="in1" type="number" />
+        <input id="in2" type="number" />
+        <button id="add">Add</button>
+        <button id="subtract">Subtract</button>
+        <button id="multiply">Multiply</button>
+        <button id="divide">Divide</button>
+        <p id="answer2"></p>
+        <button id="increment">Increment</button>
+        <p id="num"></p>
+        <script type="text/javascript">
+            const answer = document.querySelector('#answer');
+            const answer2 = document.querySelector('#answer2');
+            const add = document.querySelector('#add');
+            const subtract = document.querySelector('#subtract');
+            const multiply = document.querySelector('#multiply');
+            const divide = document.querySelector('#divide');
+            const in1 = document.querySelector('#in1');
+            const in2 = document.querySelector('#in2');
+            let shared = new SharedArrayBuffer(4);
+           // const shared = new SharedWorker('shared.js');
+            const worker = new Worker('worker_to_shared.js');
+            worker.postMessage(shared);
+            shared = new Int32Array(shared);
+
+            document.querySelector('#increment').addEventListener('click', () => {
+                worker.postMessage(1);
+            });
+            setInterval(() => {
+                document.querySelector('#num').innerText = shared;
+            }, 100);
+            const mathHandler = function(ev) {
+                switch(ev.target.innerText.toLowerCase()) {
+                    case "add": {
+                        worker.postMessage(`add ${in1.value} ${in2.value}`);
+                        break;
+                    }
+                    case "subtract": {
+                        worker.postMessage(`subtract ${in1.value} ${in2.value}`);
+                        break;
+                    }
+                    case "multiply": {
+                        worker.postMessage(`multiply ${in1.value} ${in2.value}`);
+                        break;
+                    }
+                    case "divide": {
+                        worker.postMessage(`divide ${in1.value} ${in2.value}`);
+                        break;
+                    }
+                }
+            }
+            add.addEventListener('click', mathHandler);
+            subtract.addEventListener('click', mathHandler);
+            multiply.addEventListener('click', mathHandler);
+            divide.addEventListener('click', mathHandler);
+            // const even_channel = new BroadcastChannel('even');
+            // const odd_channel = new BroadcastChannel('odd');
+            // const global = new BroadcastChannel('global');
+            
+
+            //const worker = new Worker('worker.js');
+            //worker.postMessage(shared.port, [shared.port]);
+            // for(let i = 0; i < 4; i++) {
+            //     const worker = new Worker('worker.js', {name : `worker ${i % 2 === 0 ? 'even' : 'odd'}`});
+            //     worker.postMessage(shared.port, [shared.port]);
+            // }
+            document.querySelector("#in").addEventListener('change', (ev) => {
+                const value = parseInt(ev.target.value);
+                worker.postMessage(value);
+                // if( value % 2 === 0 ) {
+                //     even_channel.postMessage(value);
+                // } else {
+                //     odd_channel.postMessage(value);
+                // }
+            });
+            document.querySelector('#quit').addEventListener('click', (ev) => {
+                worker.postMesasge('quit');
+                //global.postMessage('quit');
+            });
+            //worker.onmessage = function(ev) {
+            //    const data = new Int32Array(ev.data);
+            //    answer.innerText = data.join(' ');
+            //}
+            // even_channel.onmessage = function(ev) {
+            //     if( typeof ev.data === 'object' ) {
+            //         const data = new Int32Array(ev.data);
+            //         answer.innerText = data.join(' ');
+            //         //answer.innerText = ev.data.join(' ');
+            //     }
+            // }
+            // odd_channel.onmessage= function(ev) {
+            //     if( typeof ev.data === 'object' ) {
+            //         const data = new Int32Array(ev.data);
+            //         answer.innerText = data.join(' ');
+            //         //answer.innerText = ev.data.join(' ');
+            //     }
+            // }
+
+            // const largeWorker = new Worker('largeObject.js');
+            // largeWorker.onmessage = function(ev) {
+            //     console.log('the time is', Date.now());
+            //     const obj = ev.data;
+            //     console.log('data length', obj.byteLength);
+            // }
+        </script>
+    </body>
+</html>

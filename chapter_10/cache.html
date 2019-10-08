@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<head>
+</head>
+<template id="row">
+    <tr>
+        <td class="name"></td>
+        <td class="zip"></td>
+        <td class="phone"></td>
+        <td class="email"></td>
+        <td class="buy"></td>
+        <td class="sell"></td>
+    </tr>
+</template>
+<body>
+    <button id="request">Request</button>
+    <table id="buysellorders">
+        <thead>
+        <tr>
+            <th>Customer Name</th>
+            <th>Zipcode</th>
+            <th>Phone Number</th>
+            <th>Email</th>
+            <th>Buy Order Amount</th>
+            <th>Sell Order Amount</th>
+        </tr>
+        <tbody>
+        </tbody>
+        </thead>
+    </table>
+    <script type="text/javascript">
+    const tableBody = document.querySelector('#buysellorders > tbody');
+    const rowTemplate = document.querySelector('#row');
+    const requestButton = document.querySelector('#request');
+    const worker = new SharedWorker('cache_shared.js', {name : 'cache'});
+    const requestMap = new Map();
+    let reqCounter = 0;
+
+    requestButton.addEventListener('click', (ev) => {
+        const res = simulateRequest();
+        const reqId = reqCounter;
+        reqCounter += 1;
+        requestMap.set(reqId, res);
+        const attribute = [];
+        for(let i = 0; i < res.length; i++) {
+            attribute.push(res[i].id);
+        }
+        worker.port.postMessage({
+            id : reqId,
+            data : attribute
+        });
+    });
+
+    worker.port.onmessage = function(ev) {
+        const data = ev.data;
+        const baseData = requestMap.get(data.id);
+        requestMap.delete(data.id);
+        const attribution = data.data;
+        tableBody.innerHTML = '';
+        for(let i = 0; i < baseData.length; i++) {
+            const _d = baseData[i];
+            for(let j = 0; j < attribution.length; j++) {
+                if( _d.id === attribution[j].id ) {
+                    const final = {..._d, ...attribution[j]};
+                    const newRow = rowTemplate.content.cloneNode(true);
+                    newRow.querySelector('.name').innerText = final.full_name;
+                    newRow.querySelector('.zip').innerText = final.zipcode;
+                    newRow.querySelector('.phone').innerText = final.phone;
+                    newRow.querySelector('.email').innerText = final.email;
+                    newRow.querySelector('.buy').innerText = final.buy;
+                    newRow.querySelector('.sell').innerText = final.sell;
+                    tableBody.appendChild(newRow);
+                }
+            }
+        }
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+    const getRandomIntInclusive = function(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    const simulateRequest = function() {
+        const MAX_BUY_SELL = 1000000;
+        const MIN_BUY_SELL = -1000000;
+        const ids = [];
+        const createdIds = [];
+        for(let i = 0; i < 100; i++) {
+            const id = getRandomIntInclusive(1, 1000);
+            if(!createdIds.includes(id)) {
+                const obj = {
+                    id,
+                    buy : getRandomIntInclusive(MIN_BUY_SELL, MAX_BUY_SELL),
+                    sell : getRandomIntInclusive(MIN_BUY_SELL, MAX_BUY_SELL)
+                };
+                ids.push(obj);
+            }
+        }
+        return ids;
+    }
+    </script>
+</body>
+</html>
