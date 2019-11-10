@@ -1,0 +1,25 @@
+*, :root {
+    margin : 0;
+    padding : 0;
+    font-size : 12px;
+}
+
+table {
+    margin: 15px;
+    border : 1px solid black;
+}
+
+th {
+    border : 1px solid black;
+    padding : 2px;
+}
+
+button {
+    border : 1px solid black;
+    padding :5px;
+    background : #2e2e2e;
+    color : #cfcfcf;
+    cursor : pointer; 
+    margin-left : 15px;
+    margin-top : 15px;
+}

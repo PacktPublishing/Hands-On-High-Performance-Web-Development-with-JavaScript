@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+    <head>
+        <title>Offline Storage Example</title>
+        <link href="main.css" />
+    </head>
+    <body>
+        <h1>Offline Storage</h1>
+        <button id="makeRequest">Request</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>name</th>
+                    <th>phone</th>
+                    <th>delete</th>
+                </tr>
+            </thead>
+            <tbody id="body"></tbody>
+        </table>
+        <p>Are we online?: <span id="online">No</span></p>
+        <p>Oustanding requests: <span id="outstanding">0</span></p>
+        <button id="stop">Stop all Pending</button>
+        <script src="interactions.js"></script>
+        <script>
+            let online = false;
+            const onlineNotification = document.querySelector('#online');
+            window.addEventListener('load', function() {
+                const changeOnlineNotification = function(status) {
+                    onlineNotification.textContent = status ? "Yes" : "No";
+                    online = status;
+                }
+                changeOnlineNotification(navigator.onLine);
+                navigator.serviceWorker.register('./OfflineCacheWorker.js', { scope : '/'})
+                .then((reg) => {
+                    console.log('successfully registered worker');
+                }).catch((err) => {
+                    console.error('there seems to be an issue!', err);
+                });
+                window.addEventListener('online', () => { changeOnlineNotification(navigator.onLine) });
+                window.addEventListener('offline', () => { changeOnlineNotification(navigator.onLine) });
+            });
+        </script>
+    </body>
+</html>

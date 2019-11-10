@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+    <head>
+        <link rel="stylesheet" href="main.css" />
+    </head>
+    <body>
+        <button id="addRow">Add</button>
+        <button id="remove">Remove</button>
+        <button id="random">Random</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+            </tbody>
+        </table>
+        <script type="text/javascript">
+            navigator.serviceWorker.register('./CacheServiceWorker.js', { scope : '/'})
+            .then((reg) => {
+                console.log('successfully registered worker');
+            }).catch((err) => {
+                console.error('there seems to be an issue!', err);
+            });
+        </script>
+        <script src="interactions.js" type="text/javascript"></script>
+    </body>
+</html>
