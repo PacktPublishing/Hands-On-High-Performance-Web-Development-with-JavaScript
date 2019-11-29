@@ -1,0 +1,57 @@
+$main-color: "#003A21";
+$text-color: "#efefef";
+
+*, html {
+    margin : 0;
+    padding : 0;
+}
+
+/* header styles */
+header {
+    display    : block;
+    height     : 2rem;
+    margin     : 10px 15px;
+    overflow   : hidden;
+    position   : fixed;
+    top        : 0;
+    width      : 100%;
+    background : $main-color;
+    color      : $text-color;
+    h1 {
+        float : left;
+    }
+    nav {
+        float : right;
+    }
+}
+
+/* Footer styles */
+footer {
+    position : fixed;
+    left : 0;
+    bottom : 0;
+    width : 100%;
+    background : $main-color;
+    color  : $text-color;
+    h2 {
+        float : left;
+    } 
+    a {
+        float : right;
+    }
+}
+
+/* navbar */
+nav {
+    width : 25%;
+    display : block;
+}
+
+#content {
+    width : 75%;
+    display : block;
+}
+
+html {
+    color : blue;
+}

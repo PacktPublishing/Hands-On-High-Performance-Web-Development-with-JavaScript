@@ -1,0 +1,30 @@
+{
+    "version": "0.0.1",
+    "name": "microserver",
+    "type": "module",
+    "dependencies": {
+        "remarkable": "^2.0.0"
+    },
+    "config": {
+        "port": 50000,
+        "key": "../selfsignedkey.pem",
+        "certificate": "../selfsignedcertificate.pem",
+        "template": "../template",
+        "bodyfiles": "../publish",
+        "development": true
+    },
+    "scripts": {
+        "start": "node --experimental-modules dist/build.js",
+        "build": "rollup --config ./build/rollup.config.js && rollup --config ./build/rollup.sass.config.js",
+        "watch": "rollup --config ./build/rollup.config.js --watch",
+        "test": "jest ./test"
+    },
+    "devDependencies": {
+        "esm": "^3.2.25",
+        "jest": "^24.9.0",
+        "rollup-plugin-sass": "^1.2.2",
+        "rollup-plugin-terser": "^5.1.2",
+        "rollup-plugin-uglify": "^6.0.3",
+        "rollup": "^1.27.5"
+    }
+}
