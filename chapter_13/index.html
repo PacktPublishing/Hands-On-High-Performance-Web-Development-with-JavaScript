@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<head></head>
+<body>
+</body>
+<script type="text/javascript">
+    const memory = new WebAssembly.Memory({initial : 1});
+    const storeByte = new Int32Array(memory.buffer, 0, 1);
+    storeByte[0] = 200;
+    function readNumber() {
+        const bytes = new Uint32Array(memory.buffer, 0, 1);
+        console.log('The number that was put here is:', bytes[0]);
+    }
+    
+    function consoleLogString(offset, length) {
+        const bytes = new Uint8Array(memory.buffer, offset, length);
+        const string = new TextDecoder('utf8').decode(bytes);
+        console.log(string);
+    }
+    function add (p1, p2) {
+        return p1 + p2;
+    }
+    const importObject = { console: {log: consoleLogString}, js: {mem: memory}};
+    WebAssembly.instantiateStreaming(fetch('first.wasm'), importObject).then(obj => {
+        obj.instance.exports.fizzbuzz(10);
+    });
+</script>
+</html>

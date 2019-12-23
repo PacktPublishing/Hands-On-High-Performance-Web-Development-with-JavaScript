@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+    <head>
+        <script src='sqljs/dist/sql-wasm.js'></script>
+    </head>
+    <body>
+        <script type="module">
+            const insertCustomerData = `INSERT INTO customer VALUES (NULL, ?, ?, ?)`;
+            const insertRpcData = `INSERT INTO rpc_operations VALUES (NULL, ?, ?, time('now'))`;
+            const customers = [
+                ['Morissa', 'Catford', 'mcatford0'],
+                ['Aguistin', 'Blaxlande', 'ablaxlande1'],
+                ['Leanora', 'Lambillion', 'llambillion2'],
+                ['Menard', 'Cusiter', 'mcusiter3'],
+                ['Erastus', 'Kinworthy', 'ekinworthy4']
+            ];
+
+            const ops = [
+                ['1', 'add'],
+                ['2', 'subtract'],
+                ['3', 'multiply'],
+                ['1', 'multiply']
+            ]
+
+            initSqlJs({locateFile: () => `sqljs/dist/sql-wasm.wasm` }).then(function(SQL){
+                const db = new SQL.Database();
+                db.run(`CREATE TABLE customer 
+                    (id INTEGER PRIMARY KEY ASC, 
+                    first_name TEXT,
+                     last_name TEXT, 
+                     username TEXT UNIQUE)
+                    `);
+                db.run(`CREATE TABLE rpc_operations 
+                    (id INTEGER PRIMARY KEY ASC, 
+                    customer_id INTEGER,
+                    op TEXT, 
+                    timestamp INTEGER,
+                    FOREIGN KEY(customer_id) REFERENCES customer(id))`);
+
+
+                for(let i = 0; i < customers.length; i++) {
+                    db.run(insertCustomerData, customers[i]);
+                }
+                for(let i = 0; i < ops.length; i++) {
+                    db.run(insertRpcData, ops[i]);
+                }
+
+                const statement = db.prepare("SELECT * FROM customer c JOIN rpc_operations ro ON c.id = ro.customer_id WHERE c.username = $username");
+                statement.bind({$username : 'mcatford0'});
+                while(statement.step()) {
+                    const row = statement.getAsObject();
+                    console.log(JSON.stringify(row));
+                }
+            });
+        </script>
+    </body>
+</html>
