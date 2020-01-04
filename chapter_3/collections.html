@@ -56,7 +56,7 @@
         map.has('0item');
         map.clear();
 
-        const items = new Map();
+        const items = new WeakMap();
         const container = document.getElementById('content');
         for(let i = 0; i < 50000; i++) {
             const el = document.createElement('li');
@@ -68,8 +68,9 @@
             container.appendChild(el);
         }
         const removeHalf = function() {
-            for(let i = 0; i < container.children.length; i++) {
-                if( i % 2 ) { container.removeChild(container.children[i]) };
+            const amount = Math.floor(container.children.length / 2);
+            for(let i = 0; i < amount; i++) {
+                container.removeChild(container.firstChild);
             }
         }
 
