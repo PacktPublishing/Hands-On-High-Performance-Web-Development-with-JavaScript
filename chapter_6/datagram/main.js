@@ -29,6 +29,8 @@ recvServer.on('connection', (socket) => {
             socket.write('ERROR!');
             return;
         }
+        const buyOrSell = input[0];
+        const tickerSymbol = input[1];
         const num = parseInt(input[2]);
         if( typeof num === 'NaN' ) {
             console.log('the amount that the client wants to buy or sell is not a number');
@@ -38,37 +40,38 @@ recvServer.on('connection', (socket) => {
         // number held by server
         const numHeld = symbolTable.get(input[1]);
         if( typeof numHeld === 'undefined' ||
-            numHeld <= 0 ||
-            input[0] === 'BUY' &&
-            numHeld - num <= 0 ) {
+            (buyOrSell === 'BUY' && (
+                num <= 0 ||
+                numHeld - num <= 0
+            ))) {
             console.log('there is not that many shares currently held by the reserve');
             socket.write('ERROR!');
             return;
         }
         // check to make sure the client has that amount in their book
         const clientBook = clientTable.get(socket);
-        const clientAmount = clientBook.get(input[1]);
+        const clientAmount = clientBook.get(tickerSymbol);
         console.log(clientAmount);
-        if( input[0] === 'SELL' &&
+        if( buyOrSell === 'SELL' &&
             clientAmount - num < 0 ) {
             console.log('the client does not hold that amount in their book');
             socket.write('ERROR!');
             return;
         }
         // process the request
-        if( input[0] === 'BUY' ) {
-            clientBook.set(input[1], clientAmount + num);
-            symbolTable.set(input[1], numHeld - num);
-        } else if(input[0] === 'SELL' ) {
-            clientBook.set(input[1], clientAmount - num);
-            symbolTable.set(input[1], numHeld + num);
+        if(  buyOrSell === 'BUY' ) {
+            clientBook.set(tickerSymbol, clientAmount + num);
+            symbolTable.set(tickerSymbol, numHeld - num);
+        } else if( buyOrSell === 'SELL' ) {
+            clientBook.set(tickerSymbol, clientAmount - num);
+            symbolTable.set(tickerSymbol, numHeld + num);
         } else {
             return;
         }
-        const m = Buffer.from(`${input[1]} ${symbolTable.get(input[1])}`);
+        const m = Buffer.from(`${tickerSymbol} ${symbolTable.get(tickerSymbol)}`);
         server.send(m, 0, m.byteLength, 3000, multicastAddress);
-        socket.write(`successfully processed request, you now hold ${clientBook.get(input[1])} of ${input[1]}`);
-        console.log('processed request', input[1], symbolTable.get(input[1]));
+        socket.write(`successfully processed request, you now hold ${clientBook.get(tickerSymbol)} of ${tickerSymbol}`);
+        console.log('processed request', tickerSymbol, symbolTable.get(tickerSymbol));
     });
     socket.on('error', (err) => console.log('client removed from list'));
 });
