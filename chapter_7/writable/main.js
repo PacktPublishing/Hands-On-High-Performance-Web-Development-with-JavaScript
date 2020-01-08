@@ -14,29 +14,27 @@ export default class WriteMessagePassStream extends Writable {
         this.#socket = options.socket;
     }
     _write(chunk, encoding, callback) {
-        if( this.#writing ) {
-            let i = -1;
-            if((i = chunk.indexOf(0x00)) !== -1) {
-                const buf = chunk.slice(0, i);
-                this.#socket.write(buf);
-                this.#socket.write("!!!END!!!");
-                if( i !== chunk.byteLength - 1) { // we are not at the end of the chunk start new frame
-                    this.#socket.write("!!!START!!!");
-                    const buf2 = chunk.slice(i, chunk.byteLength - 1);
-                    this.#socket.write(buf2);
-                } else {
-                    this.#writing = false;
-                }
-            } else {
-                this.#socket.write(chunk);
-            }
-            return callback();
-        }
         if(!this.#writing) {
             this.#writing = true;
             this.#socket.write("!!!START!!!");
-            this.#socket.write(chunk);
-            return callback();
         }
+        let i = -1;
+        let numCount = 0;
+        let prevI = 0;
+        while((i = chunk.indexOf(0x00, i)) !== -1) {
+            const buf = chunk.slice(prevI, i);
+            this.#socket.write(buf);
+            this.#socket.write("!!!END!!!");
+            if( i !== chunk.byteLength - 1) { // we are not at the end of the chunk start new frame
+                this.#socket.write("!!!START!!!");
+            } else {
+                return callback();
+            }
+            numCount += 1;
+        } 
+        if(!numCount ) {
+            this.#socket.write(chunk);
+        }
+        return callback();
     }
 }

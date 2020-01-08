@@ -13,7 +13,7 @@ class LoremFinder extends Readable {
             const byte = chunk[i];
             if( byte === this.#lorem[this.#found] ) {
                 if(!this.#found ) {
-                    this.#startByteLoc = this.#totalCount += i;  
+                    this.#startByteLoc = this.#totalCount + i;  
                 }
                 this.#found += 1;
             } else {
@@ -26,7 +26,7 @@ class LoremFinder extends Readable {
                 this.#found = 0;
             }
         }
-        this.#startByteLoc += chunk.byteLength;
+        this.#totalCount += chunk.byteLength;
     }
     constructor(opts) {
         super(opts);
