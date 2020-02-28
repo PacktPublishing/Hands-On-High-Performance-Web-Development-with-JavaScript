@@ -1,6 +1,6 @@
-import http from 'http';
+import https from 'https';
 
-http.get('https://en.wikipedia.org/wiki/Surprise_(emotion)', (res) => {
+https.get('https://en.wikipedia.org/wiki/Surprise_(emotion)', (res) => {
     if( res.statusCode === 200 ) {
         res.on('data', (data) => {
             console.log(data.toString('utf8'));
